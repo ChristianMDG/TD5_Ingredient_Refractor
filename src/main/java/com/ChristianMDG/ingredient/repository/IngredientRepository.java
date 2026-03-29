@@ -1,12 +1,16 @@
 package com.ChristianMDG.ingredient.repository;
 
 import com.ChristianMDG.ingredient.entity.Ingredient;
+import com.ChristianMDG.ingredient.entity.StockValue;
 import com.ChristianMDG.ingredient.entity.enums.CategoryEnum;
+import com.ChristianMDG.ingredient.entity.enums.UnitEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,5 +50,32 @@ public class IngredientRepository {
            System.out.println(e.getMessage());
        }
        return ingredient;
+    }
+
+    public StockValue getStockValueAt(Instant t, Integer ingredientId,UnitEnum unit) {
+        String sql = """
+        select unit, sum(
+            case
+                when type = 'OUT' then quantity * -1
+                else quantity
+            end
+        ) as actual_quantity 
+        from stockmovement
+        where creation_datetime <= ?
+        and id_ingredient = ?
+        and unit = ?::unit_type
+        group by unit
+    """;
+
+        try {
+            return jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
+                            new StockValue(
+                                    rs.getDouble("actual_quantity"),
+                                    UnitEnum.valueOf(rs.getString("unit"))
+                            )
+                    , Timestamp.from(t), ingredientId,unit.name());
+        } catch (EmptyResultDataAccessException e) {
+            return new StockValue(0.0, null);
+        }
     }
 }
