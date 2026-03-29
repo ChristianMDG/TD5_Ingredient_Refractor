@@ -20,20 +20,22 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 public class IngredientController {
-   private IngredientService ingredientService;
-   private IngredientRepository ingredientRepository;
+    private IngredientService ingredientService;
+    private IngredientRepository ingredientRepository;
 
     @GetMapping("/ingredients")
     public ResponseEntity<?> getAllIngredients() {
-       return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);
     }
-   @GetMapping("/ingredient/{id}")
-    public ResponseEntity<?>  getIngredientById(@PathVariable Integer id) {
-        Ingredient ingredient = ingredientRepository.getIngredientById(id);
-        if (ingredient.getId() == null) {
-          return new ResponseEntity<>("Ingredient.id=" + id + " is not found",HttpStatus.NOT_FOUND);
+
+    @GetMapping("/ingredient/{id}")
+    public ResponseEntity<?> getIngredientById(@PathVariable Integer id) {
+        try {
+            Ingredient ingredient = ingredientService.getIngredientById(id);
+            return new ResponseEntity<>(ingredient, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(ingredient, HttpStatus.OK);
     }
 
     @GetMapping("/ingredients/{id}/stock")
@@ -42,15 +44,13 @@ public class IngredientController {
             @RequestParam(required = false) String at,
             @RequestParam(required = false) String unit
     ) {
-        Ingredient ingredient = ingredientRepository.getIngredientById(id);
-        if (at == null || unit == null) {
-            return new ResponseEntity<>("Either mandatory query parameter `at` or\n" +
-                    "`unit` is not provided",HttpStatus.BAD_REQUEST);
+        try {
+            StockValue stockValue = ingredientService.getStockValue(id, at, unit);
+            return ResponseEntity.ok(stockValue);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        if (ingredient.getId() == null) {
-            return new ResponseEntity<>("Ingredient.id=" + id + " is not found",HttpStatus.NOT_FOUND);
-        }
-        StockValue stockValue = ingredientRepository.getStockValueAt(Instant.parse(at),id, UnitEnum.valueOf(unit));
-        return ResponseEntity.ok(stockValue);
     }
 }
