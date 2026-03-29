@@ -5,6 +5,7 @@ import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.entity.StockValue;
 import com.ChristianMDG.ingredient.entity.enums.UnitEnum;
 import com.ChristianMDG.ingredient.repository.IngredientRepository;
+import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,25 +14,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.List;
-
 @RestController
 @AllArgsConstructor
 public class IngredientController {
-    private IngredientRepository ingredientRepository;
+    private IngredientService ingredientService;
 
     @GetMapping("/ingredients")
-    public List<Ingredient> getAllIngredients() {
-        return ingredientRepository.getAllIngredients();
+    public ResponseEntity<?> getAllIngredients() {
+        return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);
     }
+
     @GetMapping("/ingredient/{id}")
-    public ResponseEntity<?>  getIngredientById(@PathVariable Integer id) {
-        Ingredient ingredient = ingredientRepository.getIngredientById(id);
-        if (ingredient == null) {
-          return new ResponseEntity<>("Ingredient.id=" + id + " is not found",HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getIngredientById(@PathVariable Integer id) {
+        try {
+            Ingredient ingredient = ingredientService.getIngredientById(id);
+            return new ResponseEntity<>(ingredient, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(ingredient, HttpStatus.OK);
     }
 
     @GetMapping("/ingredients/{id}/stock")
@@ -40,16 +40,13 @@ public class IngredientController {
             @RequestParam(required = false) String at,
             @RequestParam(required = false) String unit
     ) {
-        Ingredient ingredient = ingredientRepository.getIngredientById(id);
-        if (at == null || unit == null) {
-            return new ResponseEntity<>("Either mandatory query parameter `at` or\n" +
-                    "`unit` is not provided",HttpStatus.BAD_REQUEST);
+        try {
+            StockValue stockValue = ingredientService.getStockValue(id, at, unit);
+            return ResponseEntity.ok(stockValue);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
-        if (ingredient == null) {
-            return new ResponseEntity<>("Ingredient.id=" + id + " is not found",HttpStatus.NOT_FOUND);
-        }
-        StockValue stockValue = ingredientRepository.getStockValueAt(Instant.parse(at),id, UnitEnum.valueOf(unit));
-
-        return ResponseEntity.ok(stockValue);
     }
 }

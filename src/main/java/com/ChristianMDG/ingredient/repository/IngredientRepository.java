@@ -1,15 +1,15 @@
 package com.ChristianMDG.ingredient.repository;
 
+import com.ChristianMDG.ingredient.config.DataSource;
 import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.entity.StockValue;
 import com.ChristianMDG.ingredient.entity.enums.CategoryEnum;
 import com.ChristianMDG.ingredient.entity.enums.UnitEnum;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
+
+import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,65 +17,84 @@ import java.util.List;
 @Repository
 @AllArgsConstructor
 public class IngredientRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private final DataSource dataSource;
 
     public List<Ingredient> getAllIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
-        String getIngredientsql = "SELECT ingredient.id,ingredient.name,ingredient.price,ingredient.category FROM ingredient";
+        String getAllIngredientSql = "SELECT id,name,price,category FROM Ingredient";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(getAllIngredientSql)) {
+            preparedStatement.execute();
+            ResultSet resultSet = preparedStatement.getResultSet();
+            while (resultSet.next()) {
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(resultSet.getInt("id"));
+                ingredient.setName(resultSet.getString("name"));
+                ingredient.setPrice(resultSet.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
+                ingredients.add(ingredient);
+            }
 
-            ingredients = jdbcTemplate.query(getIngredientsql,(rs, rowNum) -> new Ingredient(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getDouble("price"),
-                    CategoryEnum.valueOf(rs.getString("category"))
-            ));
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
         return ingredients;
     }
 
+    public Ingredient getIngredientById(int id) {
+        Ingredient ingredient = new Ingredient();
+        String getIngredientSql = "SELECT id,name,price,category FROM Ingredient WHERE id=?";
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(getIngredientSql)){
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                ingredient.setId(resultSet.getInt("id"));
+                ingredient.setName(resultSet.getString("name"));
+                ingredient.setPrice(resultSet.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
+            }
 
-    public Ingredient getIngredientById(Integer id) {
-        Ingredient ingredient = null;
-        String sql = "select * from ingredient where id = ?";
-       try{
-           ingredient = jdbcTemplate.queryForObject(sql,(rs, rowNum) ->
-                   new Ingredient(
-                           rs.getInt("id"),
-                           rs.getString("name"),
-                           rs.getDouble("price"),
-                           CategoryEnum.valueOf(rs.getString("category"))
-                   )
-                   ,id);
-
-       } catch (EmptyResultDataAccessException e) {
-           System.out.println(e.getMessage());
-       }
-       return ingredient;
-    }
-
-    public StockValue getStockValueAt(Instant t, Integer ingredientId,UnitEnum unit) {
-        String sql = """
-        select unit, sum(
-            case
-                when type = 'OUT' then quantity * -1
-                else quantity
-            end
-        ) as actual_quantity 
-        from stockmovement
-        where creation_datetime <= ?
-        and id_ingredient = ?
-        and unit = ?::unit_type
-        group by unit
-    """;
-
-        try {
-            return jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
-                            new StockValue(
-                                    rs.getDouble("actual_quantity"),
-                                    UnitEnum.valueOf(rs.getString("unit"))
-                            )
-                    , Timestamp.from(t), ingredientId,unit.name());
-        } catch (EmptyResultDataAccessException e) {
-            return new StockValue(0.0, null);
+        }catch (Exception e){
+            throw new RuntimeException(e);
         }
+        return ingredient;
     }
-}
+
+    public StockValue getStockValueAt(Instant t, Integer ingredientIdentifier, UnitEnum unit) {
+
+
+        StockValue stockValue = new StockValue();
+        String getStockValueSql = """
+              select unit , sum(
+              case
+                  when stockmovement.type = 'OUT' then stockmovement.quantity * -1
+                            else stockmovement.quantity
+                            end
+                            ) as actual_quantity from stockmovement
+              where creation_datetime <= ?
+              and stockmovement.id_ingredient = ?
+              and stockmovement.unit = ?::unit_type
+              group by unit
+            """;
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(getStockValueSql)) {
+            preparedStatement.setTimestamp(1, Timestamp.from(t));
+            preparedStatement.setInt(2, ingredientIdentifier);
+            preparedStatement.setString(3, unit.name());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                stockValue.setUnit(UnitEnum.valueOf(resultSet.getString("unit")));
+                stockValue.setQuantity(resultSet.getDouble("actual_quantity"));
+            }
+            return stockValue;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    }
+
+
+
