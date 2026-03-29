@@ -5,6 +5,7 @@ import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.entity.StockValue;
 import com.ChristianMDG.ingredient.entity.enums.UnitEnum;
 import com.ChristianMDG.ingredient.repository.IngredientRepository;
+import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +20,17 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 public class IngredientController {
-    private IngredientRepository ingredientRepository;
+   private IngredientService ingredientService;
+   private IngredientRepository ingredientRepository;
 
     @GetMapping("/ingredients")
-    public List<Ingredient> getAllIngredients() {
-        return ingredientRepository.getAllIngredients();
+    public ResponseEntity<?> getAllIngredients() {
+       return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);
     }
-    @GetMapping("/ingredient/{id}")
+   @GetMapping("/ingredient/{id}")
     public ResponseEntity<?>  getIngredientById(@PathVariable Integer id) {
         Ingredient ingredient = ingredientRepository.getIngredientById(id);
-        if (ingredient == null) {
+        if (ingredient.getId() == null) {
           return new ResponseEntity<>("Ingredient.id=" + id + " is not found",HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(ingredient, HttpStatus.OK);
@@ -45,11 +47,10 @@ public class IngredientController {
             return new ResponseEntity<>("Either mandatory query parameter `at` or\n" +
                     "`unit` is not provided",HttpStatus.BAD_REQUEST);
         }
-        if (ingredient == null) {
+        if (ingredient.getId() == null) {
             return new ResponseEntity<>("Ingredient.id=" + id + " is not found",HttpStatus.NOT_FOUND);
         }
         StockValue stockValue = ingredientRepository.getStockValueAt(Instant.parse(at),id, UnitEnum.valueOf(unit));
-
         return ResponseEntity.ok(stockValue);
     }
 }
