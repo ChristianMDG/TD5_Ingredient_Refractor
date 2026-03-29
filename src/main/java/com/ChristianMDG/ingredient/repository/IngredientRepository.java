@@ -29,7 +29,7 @@ public class IngredientRepository {
     }
 
 
-    public Ingredient findIngredientById(Integer id) {
+    public Ingredient getIngredientById(Integer id) {
         Ingredient ingredient = null;
         String sql = "select * from ingredient where id = ?";
        try{
