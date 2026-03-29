@@ -14,14 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.List;
-
 @RestController
 @AllArgsConstructor
 public class IngredientController {
     private IngredientService ingredientService;
-    private IngredientRepository ingredientRepository;
 
     @GetMapping("/ingredients")
     public ResponseEntity<?> getAllIngredients() {
