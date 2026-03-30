@@ -46,9 +46,31 @@ public class DishRepository {
         return dishes;
     }
 
-    public Dish findById(Integer id) {
-        throw  new UnsupportedOperationException("Not supported yet.");
+    public Dish findDishById(Integer id) {
+
+        Dish dish = null;
+        String findDishByIdQuery = """
+              SELECT id, name, price, dish_type FROM dish WHERE id = ?;
+                """;
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(findDishByIdQuery)){
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()) {
+                dish = new Dish();
+                dish.setId(resultSet.getInt("id"));
+                dish.setName(resultSet.getString("name"));
+                dish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
+                dish.setPrice(resultSet.getDouble("price"));
+                dish.setIngredients(findDishIngredientByDishId(id));
+
+            }
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+        return dish;
     }
+
 
     private List<DishIngredient> findDishIngredientByDishId(Integer idDish) {
 
@@ -88,5 +110,42 @@ public class DishRepository {
         }
 
         return listIngredient;
+    }
+
+    private  void deleteDishIngredientByDishId(Integer idDish) {
+        String deteleDishingredientByDishIdQuery = """
+               delete from dishingredient where id_dish = ?
+        """;
+        try(Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(deteleDishingredientByDishIdQuery)) {
+            preparedStatement.setInt(1, idDish);
+            preparedStatement.execute();
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public Dish updateDishIngredients(Integer dishId, List<Ingredient> ingredients) {
+        String insertBatch  = """
+                insert into dishingredient (id_dish, id_ingredient, quantity_required, unit)
+               values (?, ?, 1, 'KG')
+                """;
+        try(Connection connection = dataSource.getConnection()){
+            connection.setAutoCommit(false);
+            deleteDishIngredientByDishId(dishId);
+            PreparedStatement preparedStatement = connection.prepareStatement(insertBatch);
+            for (Ingredient ingredient : ingredients) {
+                preparedStatement.setInt(1, dishId);
+                preparedStatement.setInt(2, ingredient.getId());
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+            connection.commit();
+            connection.setAutoCommit(true);
+            return findDishById(dishId);
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }
