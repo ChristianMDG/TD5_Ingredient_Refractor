@@ -1,0 +1,118 @@
+{
+  "info": {
+    "_postman_id": "b5ec8390-5a01-4e3b-a517-6ac63e34078b",
+    "name": "TD5 Ingredient_SpringBoot",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37893023"
+  },
+  "item": [
+    {
+      "name": "Get all Ingredients",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/ingredients",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "ingredients"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get ingredient by id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/ingredient/50",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "ingredient",
+            "50"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getStock",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/ingredients/1/stock?at=2015-01-07T00:00:00Z&unit=KG",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "ingredients",
+            "1",
+            "stock"
+          ],
+          "query": [
+            {
+              "key": "at",
+              "value": "2015-01-07T00:00:00Z"
+            },
+            {
+              "key": "unit",
+              "value": "KG"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get all dishes",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "updatedish",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  { \"id\": 1},\n  { \"id\": 2}\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/dishes/2/ingredients",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "dishes",
+            "2",
+            "ingredients"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
