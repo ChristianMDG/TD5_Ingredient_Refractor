@@ -2,7 +2,6 @@ package com.ChristianMDG.ingredient.controller;
 
 import com.ChristianMDG.ingredient.entity.Dish;
 import com.ChristianMDG.ingredient.entity.Ingredient;
-import com.ChristianMDG.ingredient.repository.DishRepository;
 import com.ChristianMDG.ingredient.service.DishService;
 import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
@@ -10,10 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Objects;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 

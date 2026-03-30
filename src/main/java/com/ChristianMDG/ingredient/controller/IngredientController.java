@@ -1,10 +1,7 @@
 package com.ChristianMDG.ingredient.controller;
 
-import ch.qos.logback.core.model.Model;
 import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.entity.StockValue;
-import com.ChristianMDG.ingredient.entity.enums.UnitEnum;
-import com.ChristianMDG.ingredient.repository.IngredientRepository;
 import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

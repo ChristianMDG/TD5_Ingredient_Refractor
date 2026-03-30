@@ -20,7 +20,6 @@ public class DishService {
     }
 
     public Dish updateDishIngredients(Integer idDish, List<Ingredient> ingredients){
-
         dishRepository.findDishById(idDish);
         return dishRepository.updateDishIngredients(idDish, ingredients);
     }
