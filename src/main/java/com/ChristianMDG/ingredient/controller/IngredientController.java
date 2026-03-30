@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class IngredientController {
     private IngredientService ingredientService;
 
+    @GetMapping("/ingredients/paginated")
+    public ResponseEntity<?> findIngredients(@RequestParam (required = false) Integer page, @RequestParam (required = false) Integer size) {
+        return new ResponseEntity<>(ingredientService.fingIngredients(page, size), HttpStatus.OK);
+    }
+
     @GetMapping("/ingredients")
     public ResponseEntity<?> getAllIngredients() {
         return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);

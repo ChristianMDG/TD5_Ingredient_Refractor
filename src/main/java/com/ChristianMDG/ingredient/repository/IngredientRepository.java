@@ -19,6 +19,33 @@ import java.util.List;
 public class IngredientRepository {
     private final DataSource dataSource;
 
+    public List<Ingredient> findIngredients(Integer page, Integer size){
+        List<Ingredient> ingredients = new ArrayList<>();
+
+        String findIngredientsSql = """
+               select ingredient.id , ingredient.name, ingredient.price, ingredient.category from ingredient
+               limit ? offset ?
+               """;
+        int offset = (page - 1) * size;
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(findIngredientsSql)){
+            preparedStatement.setInt(1,size);
+            preparedStatement.setInt(2,offset);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(resultSet.getInt("id"));
+                ingredient.setName(resultSet.getString("name"));
+                ingredient.setPrice(resultSet.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
+                ingredients.add(ingredient);
+            }
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+        return ingredients;
+    }
+
     public List<Ingredient> getAllIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
         String getAllIngredientSql = "SELECT id,name,price,category FROM Ingredient";
@@ -62,7 +89,6 @@ public class IngredientRepository {
     }
 
     public StockValue getStockValueAt(Instant t, Integer ingredientIdentifier, UnitEnum unit) {
-
 
         StockValue stockValue = new StockValue();
         String getStockValueSql = """

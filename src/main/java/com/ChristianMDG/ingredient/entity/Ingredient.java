@@ -17,5 +17,5 @@ public class Ingredient {
     private String name;
     private Double price;
     private CategoryEnum category;
-   // private List<StockMovement> stockMovementList;
+    private List<StockMovement> stockMovementList;
 }
