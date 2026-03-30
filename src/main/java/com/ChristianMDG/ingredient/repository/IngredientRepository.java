@@ -46,6 +46,77 @@ public class IngredientRepository {
         return ingredients;
     }
 
+    public List<Ingredient> findIngredientsByCriteria(
+            String ingredientName,
+            CategoryEnum category,
+            String dishName,
+            int page,
+            int size
+    ) {
+
+        List<Ingredient> ingredients = new ArrayList<>();
+        int offset = (page - 1) * size;
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT i.id, i.name, i.price, i.category
+        FROM ingredient i
+        """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (dishName != null && !dishName.isBlank()) {
+            sql.append("""
+            JOIN dishingredient di ON di.id_ingredient = i.id
+            JOIN dish d ON d.id = di.id_dish
+        """);
+        }
+
+        sql.append(" WHERE 1=1 ");
+
+        if (ingredientName != null && !ingredientName.isBlank()) {
+            sql.append(" AND i.name ILIKE ?");
+            params.add("%" + ingredientName + "%");
+        }
+
+        if (category != null) {
+            sql.append(" AND i.category = ?::ingredient_category");
+            params.add(category.name());
+        }
+
+        if (dishName != null && !dishName.isBlank()) {
+            sql.append(" AND d.name ILIKE ?");
+            params.add("%" + dishName + "%");
+        }
+
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(size);
+        params.add(offset);
+
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(rs.getInt("id"));
+                ingredient.setName(rs.getString("name"));
+                ingredient.setPrice(rs.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+                ingredients.add(ingredient);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la recherche des ingrédients", e);
+        }
+
+        return ingredients;
+    }
+
+
     public List<Ingredient> getAllIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
         String getAllIngredientSql = "SELECT id,name,price,category FROM Ingredient";

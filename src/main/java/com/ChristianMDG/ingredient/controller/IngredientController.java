@@ -2,6 +2,7 @@ package com.ChristianMDG.ingredient.controller;
 
 import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.entity.StockValue;
+import com.ChristianMDG.ingredient.entity.enums.CategoryEnum;
 import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,14 +12,29 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 public class IngredientController {
     private IngredientService ingredientService;
 
     @GetMapping("/ingredients/paginated")
-    public ResponseEntity<?> findIngredients(@RequestParam (required = false) Integer page, @RequestParam (required = false) Integer size) {
+    public ResponseEntity<?> findIngredients(@RequestParam Integer page, @RequestParam  Integer size) {
         return new ResponseEntity<>(ingredientService.fingIngredients(page, size), HttpStatus.OK);
+    }
+
+    @GetMapping("/ingredients/search")
+    public ResponseEntity<List<Ingredient>> searchIngredients(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) CategoryEnum category,
+            @RequestParam(required = false) String dishName,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "2") int size
+    ) {
+
+        List<Ingredient> ingredients = ingredientService.searchIngredients(name, category, dishName, page, size);
+        return new ResponseEntity<>(ingredients, HttpStatus.OK);
     }
 
     @GetMapping("/ingredients")

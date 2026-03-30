@@ -2,6 +2,7 @@ package com.ChristianMDG.ingredient.service;
 
 import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.entity.StockValue;
+import com.ChristianMDG.ingredient.entity.enums.CategoryEnum;
 import com.ChristianMDG.ingredient.entity.enums.UnitEnum;
 import com.ChristianMDG.ingredient.repository.IngredientRepository;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,16 @@ public class IngredientService {
             throw new IllegalArgumentException("Offset cannot be null");
         }
        return ingredientRepository.findIngredients(size, offset);
+    }
+
+    public List<Ingredient> searchIngredients(
+            String ingredientName,
+            CategoryEnum category,
+            String dishName,
+            int page,
+            int size
+    ){
+        return ingredientRepository.findIngredientsByCriteria(ingredientName, category, dishName, page, size);
     }
 
     public List<Ingredient> findAll() {
