@@ -209,12 +209,11 @@ public class DishRepository {
             connection.setAutoCommit(false);
 
             for (CreateDishRequest request : requests) {
-                // 1️⃣ Vérifier si le nom existe déjà
                 if (existsByName(request.getName())) {
                     throw new IllegalArgumentException("Dish.name=" + request.getName() + " already exists");
                 }
 
-                // 2️⃣ Préparer et exécuter l'INSERT
+
                 try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
                     ps.setString(1, request.getName());
                     ps.setString(2, request.getDishType().name());

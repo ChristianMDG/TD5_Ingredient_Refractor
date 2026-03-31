@@ -42,7 +42,7 @@ public class DishController {
         );
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<?> createDishes(@RequestBody List<CreateDishRequest> requests) {
 
         try {
