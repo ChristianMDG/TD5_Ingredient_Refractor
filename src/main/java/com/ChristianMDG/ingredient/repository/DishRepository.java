@@ -1,6 +1,7 @@
 package com.ChristianMDG.ingredient.repository;
 
 import com.ChristianMDG.ingredient.config.DataSource;
+import com.ChristianMDG.ingredient.dto.CreateDishRequest;
 import com.ChristianMDG.ingredient.entity.Dish;
 import com.ChristianMDG.ingredient.entity.DishIngredient;
 import com.ChristianMDG.ingredient.entity.Ingredient;
@@ -144,6 +145,99 @@ public class DishRepository {
             connection.setAutoCommit(true);
             return findDishById(dishId);
         }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Dish> findDishsByIngredientName(String IngredientName){
+        List<Dish> dishes = new ArrayList<>();
+
+        String findDishsByIngredientNameSql = """
+        SELECT DISTINCT d.id, d.name, d.price, d.dish_type
+        FROM dish d
+        JOIN dishingredient di ON di.id_dish = d.id
+        JOIN ingredient i ON i.id = di.id_ingredient
+        WHERE i.name ILIKE ?
+               """;
+
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(findDishsByIngredientNameSql)){
+            preparedStatement.setString(1,IngredientName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Dish dish = new Dish();
+                dish.setId(resultSet.getInt("id"));
+                dish.setName(resultSet.getString("name"));
+                dish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
+                dish.setPrice(resultSet.getDouble("price"));
+                dish.setIngredients(findDishIngredientByDishId(resultSet.getInt("id")));
+                dishes.add(dish);
+            }
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+        return dishes;
+    }
+
+    public boolean existsByName(String name) {
+        String sql = "SELECT COUNT(*) FROM dish WHERE name = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
+    public List<Dish> saveAll(List<CreateDishRequest> requests) {
+        String insertSql = """
+        INSERT INTO dish(name, dish_type, price)
+        VALUES (?, ?::dish_type, ?)
+        RETURNING id, name, dish_type, price
+    """;
+
+        List<Dish> dishes = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+
+            for (CreateDishRequest request : requests) {
+                // 1️⃣ Vérifier si le nom existe déjà
+                if (existsByName(request.getName())) {
+                    throw new IllegalArgumentException("Dish.name=" + request.getName() + " already exists");
+                }
+
+                // 2️⃣ Préparer et exécuter l'INSERT
+                try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
+                    ps.setString(1, request.getName());
+                    ps.setString(2, request.getDishType().name());
+                    ps.setDouble(3, request.getPrice());
+
+                    ResultSet rs = ps.executeQuery();
+
+                    if (rs.next()) {
+                        Dish dish = new Dish();
+                        dish.setId(rs.getInt("id"));
+                        dish.setName(rs.getString("name"));
+                        dish.setDishType(DishTypeEnum.valueOf(rs.getString("dish_type")));
+                        dish.setPrice(rs.getDouble("price"));
+                        dish.setIngredients(new ArrayList<>());
+                        dishes.add(dish);
+                    }
+                }
+            }
+
+            connection.commit();
+            return dishes;
+
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

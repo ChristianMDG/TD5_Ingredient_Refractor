@@ -119,7 +119,7 @@ public class IngredientRepository {
 
     public List<Ingredient> getAllIngredients() {
         List<Ingredient> ingredients = new ArrayList<>();
-        String getAllIngredientSql = "SELECT id,name,price,category FROM Ingredient";
+        String getAllIngredientSql = "SELECT id,name,price,category FROM ingredient";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(getAllIngredientSql)) {
             preparedStatement.execute();
@@ -141,7 +141,7 @@ public class IngredientRepository {
 
     public Ingredient getIngredientById(int id) {
         Ingredient ingredient = new Ingredient();
-        String getIngredientSql = "SELECT id,name,price,category FROM Ingredient WHERE id=?";
+        String getIngredientSql = "SELECT id,name,price,category FROM ingredient WHERE id=?";
         try(Connection connection = dataSource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(getIngredientSql)){
             preparedStatement.setInt(1, id);
@@ -189,9 +189,8 @@ public class IngredientRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
-    }
+}
 
 
 

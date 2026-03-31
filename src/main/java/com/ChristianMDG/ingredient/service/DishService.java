@@ -1,5 +1,6 @@
 package com.ChristianMDG.ingredient.service;
 
+import com.ChristianMDG.ingredient.dto.CreateDishRequest;
 import com.ChristianMDG.ingredient.entity.Dish;
 import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.repository.DishRepository;
@@ -49,5 +50,27 @@ public class DishService {
         }
 
         return dishRepository.updateDishIngredients(idDish, validIngredients);
+    }
+
+    public List<Dish> findDishByIngredientName(String ingredientName) {
+        return dishRepository.findDishsByIngredientName(ingredientName);
+    }
+
+
+    public List<Dish> createDishes(List<CreateDishRequest> requests) {
+
+        if (requests == null || requests.isEmpty()) {
+            throw new IllegalArgumentException("Request body must not be empty");
+        }
+
+        for (CreateDishRequest request : requests) {
+            if (dishRepository.existsByName(request.getName())) {
+                throw new IllegalArgumentException(
+                        "Dish.name=" + request.getName() + " already exists"
+                );
+            }
+        }
+
+        return dishRepository.saveAll(requests);
     }
 }
