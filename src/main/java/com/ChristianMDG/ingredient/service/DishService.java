@@ -73,4 +73,8 @@ public class DishService {
 
         return dishRepository.saveAll(requests);
     }
+
+    public List<Dish> getDishesFiltered(Double priceUnder, Double priceOver, String name) {
+        return dishRepository.findDishesFiltered(priceUnder, priceOver, name);
+    }
 }

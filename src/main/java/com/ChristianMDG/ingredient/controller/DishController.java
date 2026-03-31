@@ -22,10 +22,10 @@ public class DishController {
 
     private final DishService dishService;
 
-    @GetMapping
+  /*  @GetMapping
     public ResponseEntity<?> getAllDishes() {
         return ResponseEntity.ok(dishService.getAllDishes());
-    }
+    }*/
 
     @GetMapping("/searchDish")
     public ResponseEntity<?> getDishesByIngredientName(@RequestParam String ingredientName) {
@@ -57,5 +57,15 @@ public class DishController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getDishes(
+            @RequestParam(required = false) Double priceUnder,
+            @RequestParam(required = false) Double priceOver,
+            @RequestParam(required = false) String name) {
+
+        List<Dish> dishes = dishService.getDishesFiltered(priceUnder, priceOver, name);
+        return ResponseEntity.ok(dishes);
     }
 }
