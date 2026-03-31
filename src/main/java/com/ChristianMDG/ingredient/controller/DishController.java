@@ -1,6 +1,6 @@
 package com.ChristianMDG.ingredient.controller;
 
-import com.ChristianMDG.ingredient.entity.Dish;
+
 import com.ChristianMDG.ingredient.entity.Ingredient;
 import com.ChristianMDG.ingredient.service.DishService;
 
@@ -20,12 +20,12 @@ public class DishController {
     private final DishService dishService;
 
     @GetMapping
-    public ResponseEntity<List<Dish>> getAllDishes() {
+    public ResponseEntity<?> getAllDishes() {
         return ResponseEntity.ok(dishService.getAllDishes());
     }
 
     @PutMapping("/{id}/ingredients")
-    public ResponseEntity<Dish> updateDishIngredients(
+    public ResponseEntity<?> updateDishIngredients(
             @PathVariable Integer id,
             @RequestBody List<Ingredient> ingredients
     ) {

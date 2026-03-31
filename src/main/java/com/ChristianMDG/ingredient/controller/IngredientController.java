@@ -1,14 +1,11 @@
 package com.ChristianMDG.ingredient.controller;
 
-import com.ChristianMDG.ingredient.entity.Ingredient;
-import com.ChristianMDG.ingredient.entity.StockValue;
 import com.ChristianMDG.ingredient.entity.enums.CategoryEnum;
 import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -32,7 +29,7 @@ public ResponseEntity<?> findAll(){
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Ingredient>> searchIngredients(
+    public ResponseEntity<?> searchIngredients(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) CategoryEnum category,
             @RequestParam(required = false) String dishName,
@@ -45,14 +42,14 @@ public ResponseEntity<?> findAll(){
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Ingredient> getById(@PathVariable Integer id) {
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(
                 ingredientService.getIngredientById(id)
         );
     }
 
     @GetMapping("/{id}/stock")
-    public ResponseEntity<StockValue> getStock(
+    public ResponseEntity<?> getStock(
             @PathVariable Integer id,
             @RequestParam String at,
             @RequestParam String unit
