@@ -21,7 +21,7 @@ public class IngredientController {
 
     @GetMapping("/ingredients/paginated")
     public ResponseEntity<?> findIngredients(@RequestParam Integer page, @RequestParam  Integer size) {
-        return new ResponseEntity<>(ingredientService.fingIngredients(page, size), HttpStatus.OK);
+        return new ResponseEntity<>(ingredientService.findIngredients(page, size), HttpStatus.OK);
     }
 
     @GetMapping("/ingredients/search")
