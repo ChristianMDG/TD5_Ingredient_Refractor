@@ -180,7 +180,7 @@ public class DishRepository {
     }
 
     public boolean existsByName(String name) {
-        String sql = "SELECT COUNT(*) FROM dish WHERE name = ?";
+        String sql = "SELECT COUNT(id) FROM dish WHERE name = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
