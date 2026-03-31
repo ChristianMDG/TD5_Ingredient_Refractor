@@ -5,26 +5,33 @@ import com.ChristianMDG.ingredient.entity.StockValue;
 import com.ChristianMDG.ingredient.entity.enums.CategoryEnum;
 import com.ChristianMDG.ingredient.service.IngredientService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/ingredients")
 public class IngredientController {
-    private IngredientService ingredientService;
 
-    @GetMapping("/ingredients/paginated")
-    public ResponseEntity<?> findIngredients(@RequestParam Integer page, @RequestParam  Integer size) {
-        return new ResponseEntity<>(ingredientService.findIngredients(page, size), HttpStatus.OK);
+    private final IngredientService ingredientService;
+@GetMapping
+public ResponseEntity<?> findAll(){
+    return  ResponseEntity.ok(ingredientService.findAll());
+}
+
+    @GetMapping("/paginated")
+    public ResponseEntity<?> findIngredients(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ResponseEntity.ok(
+                ingredientService.findIngredients(page, size)
+        );
     }
 
-    @GetMapping("/ingredients/search")
+    @GetMapping("/search")
     public ResponseEntity<List<Ingredient>> searchIngredients(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) CategoryEnum category,
@@ -32,39 +39,26 @@ public class IngredientController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "2") int size
     ) {
-
-        List<Ingredient> ingredients = ingredientService.searchIngredients(name, category, dishName, page, size);
-        return new ResponseEntity<>(ingredients, HttpStatus.OK);
+        return ResponseEntity.ok(
+                ingredientService.searchIngredients(name, category, dishName, page, size)
+        );
     }
 
-    @GetMapping("/ingredients")
-    public ResponseEntity<?> getAllIngredients() {
-        return new ResponseEntity<>(ingredientService.findAll(), HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<Ingredient> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(
+                ingredientService.getIngredientById(id)
+        );
     }
 
-    @GetMapping("/ingredient/{id}")
-    public ResponseEntity<?> getIngredientById(@PathVariable Integer id) {
-        try {
-            Ingredient ingredient = ingredientService.getIngredientById(id);
-            return new ResponseEntity<>(ingredient, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/ingredients/{id}/stock")
-    public ResponseEntity<?> getStockValue(
+    @GetMapping("/{id}/stock")
+    public ResponseEntity<StockValue> getStock(
             @PathVariable Integer id,
-            @RequestParam(required = false) String at,
-            @RequestParam(required = false) String unit
+            @RequestParam String at,
+            @RequestParam String unit
     ) {
-        try {
-            StockValue stockValue = ingredientService.getStockValue(id, at, unit);
-            return ResponseEntity.ok(stockValue);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+        return ResponseEntity.ok(
+                ingredientService.getStockValue(id, at, unit)
+        );
     }
 }

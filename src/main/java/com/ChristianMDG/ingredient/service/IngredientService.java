@@ -14,40 +14,41 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+
 public class IngredientService {
 
     private final IngredientRepository ingredientRepository;
     private final IngredientValidator ingredientValidator;
 
-    public List<Ingredient> findIngredients(int size, int offset) {
-        ingredientValidator.validatePagination(size, offset);
-        return ingredientRepository.findIngredients(size, offset);
+    public List<Ingredient> findIngredients(int page, int size) {
+        ingredientValidator.validatePagination(page, size);
+        return ingredientRepository.findIngredients(page, size);
     }
 
     public List<Ingredient> searchIngredients(
-            String ingredientName,
+            String name,
             CategoryEnum category,
             String dishName,
             int page,
             int size
     ) {
-        ingredientValidator.validatePagination(size, page);
+        ingredientValidator.validatePagination(page, size);
+
         return ingredientRepository.findIngredientsByCriteria(
-                ingredientName, category, dishName, page, size
+                name, category, dishName, page, size
         );
     }
-
-    public List<Ingredient> findAll() {
+public List<Ingredient> findAll(){
         return ingredientRepository.getAllIngredients();
-    }
+}
 
     public Ingredient getIngredientById(Integer id) {
         ingredientValidator.validateId(id);
 
         Ingredient ingredient = ingredientRepository.getIngredientById(id);
 
-        if (ingredient == null) {
-            throw new RuntimeException("Ingredient with id=" + id + " not found");
+        if (ingredient == null|| ingredient.getId()==null) {
+            throw new RuntimeException("Ingredient.id=" + id + " not found");
         }
 
         return ingredient;
@@ -56,15 +57,22 @@ public class IngredientService {
     public StockValue getStockValue(Integer id, String at, String unit) {
         ingredientValidator.validateStockParams(id, at, unit);
 
-        Instant instant = Instant.parse(at);
-        UnitEnum unitEnum = UnitEnum.valueOf(unit.toUpperCase());
+        Instant instant;
+        UnitEnum unitEnum;
 
-        Ingredient ingredient = ingredientRepository.getIngredientById(id);
-
-        if (ingredient == null) {
-            throw new RuntimeException("Ingredient with id=" + id + " not found");
+        try {
+            instant = Instant.parse(at);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid date format (use ISO-8601)");
         }
 
+        try {
+            unitEnum = UnitEnum.valueOf(unit.toUpperCase());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid unit");
+        }
+
+        getIngredientById(id);
         return ingredientRepository.getStockValueAt(instant, id, unitEnum);
     }
 }

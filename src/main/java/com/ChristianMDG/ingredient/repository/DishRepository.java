@@ -63,7 +63,6 @@ public class DishRepository {
                 dish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
                 dish.setPrice(resultSet.getDouble("price"));
                 dish.setIngredients(findDishIngredientByDishId(id));
-
             }
         }catch(SQLException e){
             throw new RuntimeException(e);
