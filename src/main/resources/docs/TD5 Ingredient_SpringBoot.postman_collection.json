@@ -7,112 +7,241 @@
   },
   "item": [
     {
-      "name": "Get all Ingredients",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/ingredients",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "ingredients"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "get ingredient by id",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/ingredient/50",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "ingredient",
-            "50"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "getStock",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/ingredients/1/stock?at=2015-01-07T00:00:00Z&unit=KG",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "ingredients",
-            "1",
-            "stock"
-          ],
-          "query": [
-            {
-              "key": "at",
-              "value": "2015-01-07T00:00:00Z"
-            },
-            {
-              "key": "unit",
-              "value": "KG"
+      "name": "Ingredient",
+      "item": [
+        {
+          "name": "Get all Ingredients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/ingredients",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "ingredients"
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "get all dishes",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
-    },
-    {
-      "name": "updatedish",
-      "request": {
-        "method": "PUT",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "[\n  { \"id\": 1},\n  { \"id\": 2}\n]",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "http://localhost:8080/dishes/2/ingredients",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "dishes",
-            "2",
-            "ingredients"
-          ]
+        {
+          "name": "get ingredient by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/ingredient/50",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "ingredient",
+                "50"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getStock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/ingredients/1/stock?at=2015-01-07T00:00:00Z&unit=KG",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "ingredients",
+                "1",
+                "stock"
+              ],
+              "query": [
+                {
+                  "key": "at",
+                  "value": "2015-01-07T00:00:00Z"
+                },
+                {
+                  "key": "unit",
+                  "value": "KG"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/ingredients/search?name=laitue",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "ingredients",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "laitue"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/ingredients/paginated?page=2&size=2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "ingredients",
+                "paginated"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "size",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "Dish",
+      "item": [
+        {
+          "name": "get all dishes",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "updatedish",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  { \"id\": 1},\n  { \"id\": 2}\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/dishes/2/ingredients",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "dishes",
+                "2",
+                "ingredients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "searchName",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/dishes/searchDish?ingredientName=tomate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "dishes",
+                "searchDish"
+              ],
+              "query": [
+                {
+                  "key": "ingredientName",
+                  "value": "tomate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createdish",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"Tacos\",\n    \"dishType\": \"MAIN\",\n    \"price\": 15000\n  },\n  {\n    \"name\": \"Salade maison\",\n    \"dishType\": \"STARTER\",\n    \"price\": 8000\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/dishes/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "dishes",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getdishwithprice",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
