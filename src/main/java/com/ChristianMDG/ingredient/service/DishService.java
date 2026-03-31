@@ -30,7 +30,6 @@ public class DishService {
                     "The request body must contain a list of ingredients"
             );
         }
-
         Dish dish = dishRepository.findDishById(idDish);
         if (dish == null) {
             throw new RuntimeException("Dish " + idDish + " not found");
