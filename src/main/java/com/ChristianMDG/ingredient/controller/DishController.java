@@ -14,16 +14,17 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/dishes")
 public class DishController {
 
     private final DishService dishService;
 
-    @GetMapping("/dishes")
+    @GetMapping
     public ResponseEntity<List<Dish>> getAllDishes() {
         return ResponseEntity.ok(dishService.getAllDishes());
     }
 
-    @PutMapping("/dishes/{id}/ingredients")
+    @PutMapping("/{id}/ingredients")
     public ResponseEntity<Dish> updateDishIngredients(
             @PathVariable Integer id,
             @RequestBody List<Ingredient> ingredients
